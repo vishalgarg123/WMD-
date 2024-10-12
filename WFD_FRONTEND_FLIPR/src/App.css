@@ -1,0 +1,8 @@
+body {
+  margin: 0;
+  height: 100vh; /* Full height of the viewport */
+  background-image: url("https://www.shutterstock.com/shutterstock/photos/2517929871/display_1500/stock-vector-digital-wallet-e-wallet-online-payment-by-digital-wallet-online-banking-service-application-2517929871.jpg");
+  background-size: cover; /* Make the image cover the entire area */
+  background-repeat: no-repeat; /* Prevent the image from repeating */
+  background-attachment: fixed; /* Fixed background */
+}
