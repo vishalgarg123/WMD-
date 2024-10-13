@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import {
   Button,
@@ -26,17 +25,17 @@ interface Transaction {
   amount: number;
   type: string;
   category: string;
-  date: string; // Keep as string for API response compatibility
-  notes: string; // Ensure this exists in your API response
+  date: string;
+  notes: string;
 }
 
 // Define the structure for form data
 interface FormData {
-  amount: string; // Keep this as string to match the form input
+  amount: string;
   type: string;
   category: string;
   date: string;
-  notes: string; // This should match the transaction structure
+  notes: string;
 }
 
 const TransactionPage: React.FC = () => {
@@ -56,7 +55,7 @@ const TransactionPage: React.FC = () => {
 
   const getAuthToken = () => {
     const user = JSON.parse(localStorage.getItem("user") || '{}');
-    return user?.token; // Assuming token is stored as 'token' in the user object
+    return user?.token;
   };
 
   const getAllTransactions = async () => {
@@ -64,14 +63,14 @@ const TransactionPage: React.FC = () => {
       setLoading(true);
       const res = await axios.get("http://localhost:3000/api/transactions", {
         headers: {
-          Authorization: `Bearer ${getAuthToken()}`, // Include the token here
+          Authorization: `Bearer ${getAuthToken()}`,
         },
         params: {
           frequency,
           type,
         },
       });
-      setAllTransaction(res.data);
+      setAllTransaction(res.data.transactions); // Adjusted to access transactions directly
     } catch (error) {
       console.error("Fetch issue with transaction", error);
     } finally {
@@ -88,7 +87,7 @@ const TransactionPage: React.FC = () => {
       setLoading(true);
       await axios.delete("http://localhost:3000/api/transactions", {
         headers: {
-          Authorization: `Bearer ${getAuthToken()}`, // Include the token here
+          Authorization: `Bearer ${getAuthToken()}`,
         },
         data: { transactionId: record._id },
       });
@@ -104,16 +103,19 @@ const TransactionPage: React.FC = () => {
     event.preventDefault();
     try {
       setLoading(true);
-      const userId = JSON.parse(localStorage.getItem("user") || '{}')._id; // Extract userId once
+      const userId = JSON.parse(localStorage.getItem("user") || '{}')._id;
+
+      const requestData = {
+        ...formData,
+        userId,
+      };
+
       if (editTable) {
         await axios.put(
           "http://localhost:3000/api/transactions",
           {
-            payload: {
-              ...formData,
-              userId,
-            },
             transactionId: editTable._id,
+            payload: requestData,
           },
           {
             headers: {
@@ -124,10 +126,7 @@ const TransactionPage: React.FC = () => {
       } else {
         await axios.post(
           "http://localhost:3000/api/transactions",
-          {
-            ...formData,
-            userId,
-          },
+          requestData,
           {
             headers: {
               Authorization: `Bearer ${getAuthToken()}`,
@@ -135,6 +134,7 @@ const TransactionPage: React.FC = () => {
           }
         );
       }
+
       setShowModal(false);
       setEditTable(null);
       setFormData({
@@ -241,8 +241,8 @@ const TransactionPage: React.FC = () => {
             width: { xs: '90%', sm: '400px' },
             margin: 'auto',
             mt: '15%',
-            borderRadius: 2, // Add rounded corners
-            boxShadow: 3, // Add some shadow
+            borderRadius: 2,
+            boxShadow: 3,
           }}
         >
           <h2>{editTable ? "Edit Transaction" : "Add Transaction"}</h2>
@@ -298,8 +298,8 @@ const TransactionPage: React.FC = () => {
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
             />
-            <Button type="submit" variant="contained" fullWidth>
-              {editTable ? "Update Transaction" : "Add Transaction"}
+            <Button type="submit" variant="contained" color="primary" fullWidth>
+              {editTable ? "Update" : "Add"}
             </Button>
           </form>
         </Box>
@@ -309,3 +309,4 @@ const TransactionPage: React.FC = () => {
 };
 
 export default TransactionPage;
+
